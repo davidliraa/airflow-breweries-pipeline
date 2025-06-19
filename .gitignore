@@ -1,0 +1,7 @@
+# Ignore pastas de logs, configs e dados locais
+logs/
+data_lake/
+__pycache__/
+*.pyc
+.env
+secrets/
