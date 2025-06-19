@@ -1,66 +1,81 @@
-# Projeto BEES - Open Brewery DB - Pipeline Medallion
 
-## Visão Geral
+# Projeto BEES - Pipeline de Dados com Airflow e Arquitetura Medallion
 
-Este projeto implementa uma pipeline de dados em arquitetura medallion (Bronze, Silver e Gold) utilizando Apache Airflow para orquestração, Docker para containerização e Python/Pandas para transformação dos dados. O objetivo é ingerir dados públicos da API Open Brewery DB, tratar e agregar informações para análises futuras.
+## 📌 Visão Geral
 
----
+Este projeto implementa uma pipeline de dados baseada em arquitetura **Medallion (Bronze, Silver e Gold)** utilizando **Apache Airflow** para orquestração, **Docker** para containerização e **Python/Pandas** para processamento de dados.
 
-## Arquitetura e Fluxo de Dados
-
-- **Bronze:** Ingestão dos dados brutos da API Open Brewery DB. Os dados são salvos em formato JSON na pasta `/data_lake/bronze/breweries`.
-- **Silver:** Transformação e limpeza dos dados brutos. Os arquivos JSON são carregados, colunas desnecessárias são removidas e os dados são salvos em CSV na pasta `/data_lake/silver/breweries`.
-- **Gold:** Agregação dos dados transformados para gerar insights. Neste caso, a contagem de cervejarias por estado, armazenada em CSV na pasta `/data_lake/gold/breweries`.
+O objetivo é ingerir dados públicos da **API Open Brewery DB**, realizar transformações e gerar agregações para futuras análises.
 
 ---
 
-## Tecnologias e Ferramentas
+## 🛠️ Arquitetura e Fluxo de Dados
 
-- Apache Airflow: Orquestração dos pipelines (DAGs bronze, silver, gold)
-- Docker/Docker Compose: Containerização e ambiente isolado
-- Python 3.x: Programação das tarefas e transformação dos dados
-- Pandas: Manipulação e transformação dos dados tabulares
-- PostgreSQL: Banco de dados usado pelo Airflow para backend metadata
+- **Bronze:**  
+Ingestão dos dados brutos da API. Arquivos salvos em formato **JSON** em `/data_lake/bronze/breweries`.
+
+- **Silver:**  
+Limpeza e transformação dos dados. Dados processados e exportados como **CSV** para `/data_lake/silver/breweries`.
+
+- **Gold:**  
+Agregação dos dados (exemplo: **contagem de cervejarias por estado**). Resultado salvo em `/data_lake/gold/breweries`.
 
 ---
 
-## Estrutura de Pastas
+## 🧰 Tecnologias e Ferramentas
 
+- **Apache Airflow:** Orquestração das DAGs (Bronze → Silver → Gold)
+- **Docker / Docker Compose:** Containerização do ambiente
+- **Python 3.x + Pandas:** Transformação e manipulação dos dados
+- **PostgreSQL:** Backend de metadata do Airflow
+
+---
+
+## 📂 Estrutura de Pastas
+
+```
 .
 ├── dags/
-│ ├── bronze_ingest_breweries.py
-│ ├── silver_transform_breweries.py
-│ └── gold_aggregate_breweries.py
+│   ├── bronze_ingest_breweries.py
+│   ├── silver_transform_breweries.py
+│   └── gold_aggregate_breweries.py
 ├── data_lake/
-│ ├── bronze/breweries/
-│ ├── silver/breweries/
-│ └── gold/breweries/
+│   ├── bronze/breweries/
+│   ├── silver/breweries/
+│   └── gold/breweries/
 ├── docker-compose.yaml
 ├── .env
 └── README.md
-
-
----
-
-## Como Executar
-
-1. Configure o arquivo `.env` com as variáveis de ambiente necessárias.
-2. Execute `docker-compose up --build` para subir os containers do Airflow.
-3. Acesse o Airflow Webserver via `http://localhost:8080`.
-4. Execute manualmente as DAGs na ordem: **bronze_ingest_breweries → silver_transform_breweries → gold_aggregate_breweries**.
-5. Os arquivos processados estarão disponíveis em `/data_lake/gold/breweries`.
+```
 
 ---
 
-## Observações
+## ▶️ Como Executar
 
-- Garanta que as pastas mapeadas no Docker estão corretas para persistência dos dados e logs.
-- Os logs das tarefas podem ser acessados diretamente pela interface web do Airflow.
-- Recomenda-se executar as DAGs manualmente na primeira vez para validar o fluxo e os dados.
+1. Configure o arquivo `.env` com os paths locais.
+2. Suba os containers:  
+   ```bash
+   docker-compose up --build
+   ```
+3. Acesse a UI do Airflow:  
+   [http://localhost:8080](http://localhost:8080)
+4. Execute manualmente as DAGs na seguinte ordem:
+   - **bronze_ingest_breweries**
+   - **silver_transform_breweries**
+   - **gold_aggregate_breweries**
+5. Confira os arquivos gerados na pasta `/data_lake/gold/breweries`.
 
 ---
 
-## Contato
+## ✅ Observações Finais
 
-David Lira - Engenheiro de Dados  
-LinkedIn: https://www.linkedin.com/in/david-a-lira/
+- Verifique o mapeamento correto de volumes para persistência de dados e logs.
+- Todos os logs de execução estão disponíveis via Web UI do Airflow.
+- O projeto foi validado ponta a ponta em ambiente local.
+
+---
+
+## 👤 Contato
+
+**David Lira – Engenheiro de Dados**  
+[LinkedIn](https://www.linkedin.com/in/david-a-lira/)
