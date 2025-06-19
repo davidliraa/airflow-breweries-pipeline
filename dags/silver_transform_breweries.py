@@ -38,11 +38,16 @@ def transform_breweries():
     # Remove linhas onde o nome da cervejaria está vazio
     df = df[df['name'].notna()]
 
-    # Salva o resultado como CSV na camada silver
-    output_file = os.path.join(output_dir, f'breweries_silver_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv')
-    df.to_csv(output_file, index=False)
+    # Salva o resultado em parquet particionado por 'state'
+    df.to_parquet(
+        output_dir,
+        partition_cols=['state'] if 'state' in df.columns else None,
+        index=False,
+        engine='pyarrow',  # ou 'fastparquet' se preferir
+        compression='snappy'
+    )
 
-    print(f'Dados transformados salvos em: {output_file}')
+    print(f'Dados transformados salvos em parquet particionado em: {output_dir}')
 
 with DAG(
     dag_id='silver_transform_breweries',

@@ -3,27 +3,28 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime
 import pandas as pd
 import os
-import glob
 
 def aggregate_breweries():
-    input_dir = '/opt/airflow/data_lake/silver/breweries'
+    input_dir = '/opt/airflow/data_lake/silver/breweries'  # diretório raiz do parquet particionado
     output_dir = '/opt/airflow/data_lake/gold/breweries'
     os.makedirs(output_dir, exist_ok=True)
 
-    # Pega todos os arquivos CSV da camada silver
-    csv_files = glob.glob(os.path.join(input_dir, 'breweries_silver_*.csv'))
-    if not csv_files:
-        raise FileNotFoundError(f'Nenhum arquivo CSV encontrado em {input_dir}')
+    # Lê o parquet particionado apontando para o diretório
+    try:
+        df_all = pd.read_parquet(input_dir, engine='pyarrow')  # ou fastparquet
+    except Exception as e:
+        raise FileNotFoundError(f'Erro ao ler parquet particionado em {input_dir}: {e}')
 
-    all_data = []
-    for file in csv_files:
-        df = pd.read_csv(file)
-        all_data.append(df)
+    # Agregação por brewery_type e estado (state ou state_province)
+    # Ajuste aqui conforme coluna existente no df
+    state_col = 'state' if 'state' in df_all.columns else 'state_province'
 
-    df_all = pd.concat(all_data, ignore_index=True)
-
-    # Exemplo de agregação: contagem de cervejarias por estado
-    df_agg = df_all.groupby('state').size().reset_index(name='brewery_count')
+    df_agg = (
+        df_all.groupby([state_col, 'brewery_type'])
+        .size()
+        .reset_index(name='brewery_count')
+        .sort_values(by=[state_col, 'brewery_type'])
+    )
 
     output_file = os.path.join(output_dir, f'breweries_gold_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv')
     df_agg.to_csv(output_file, index=False)

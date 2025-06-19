@@ -15,10 +15,10 @@ O objetivo é ingerir dados públicos da **API Open Brewery DB**, realizar trans
 Ingestão dos dados brutos da API. Arquivos salvos em formato **JSON** em `/data_lake/bronze/breweries`.
 
 - **Silver:**  
-Limpeza e transformação dos dados. Dados processados e exportados como **CSV** para `/data_lake/silver/breweries`.
+Limpeza e transformação dos dados. Dados processados e exportados em formato **Parquet** particionado por estado em `/data_lake/silver/breweries`.
 
 - **Gold:**  
-Agregação dos dados (exemplo: **contagem de cervejarias por estado**). Resultado salvo em `/data_lake/gold/breweries`.
+Agregação dos dados (exemplo: **contagem de cervejarias por tipo e estado**). Resultado salvo em CSV na pasta `/data_lake/gold/breweries`.
 
 ---
 
